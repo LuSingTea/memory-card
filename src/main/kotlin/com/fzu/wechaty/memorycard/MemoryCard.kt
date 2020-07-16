@@ -1,4 +1,4 @@
-package io.github.wechaty.memorycard
+package com.fzu.wechaty.memorycard
 
 import com.fzu.wechaty.utils.JsonUtils
 import kotlinx.coroutines.*

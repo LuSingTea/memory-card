@@ -1,9 +1,9 @@
-package io.github.wechaty.memorycard
+package com.fzu.wechaty.memorycard
 
-import io.github.wechaty.io.github.wechaty.memorycard.backend.StorageFile
-import io.github.wechaty.io.github.wechaty.memorycard.backend.StorageNop
-import io.github.wechaty.io.github.wechaty.memorycard.backend.StorageObs
-import io.github.wechaty.io.github.wechaty.memorycard.backend.StorageS3
+import com.fzu.wechaty.memorycard.backend.StorageFile
+import com.fzu.wechaty.memorycard.backend.StorageNop
+import com.fzu.wechaty.memorycard.backend.StorageObs
+import com.fzu.wechaty.memorycard.backend.StorageS3
 
 sealed class StorageBackendOptions {
     var type: String? = null

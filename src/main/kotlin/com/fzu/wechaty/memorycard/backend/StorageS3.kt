@@ -1,14 +1,17 @@
-package io.github.wechaty.io.github.wechaty.memorycard.backend
+package com.fzu.wechaty.memorycard.backend
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
-import io.github.wechaty.memorycard.*
-import io.github.wechaty.utils.JsonUtils
+import com.fzu.wechaty.memorycard.MemoryCardPayload
+import com.fzu.wechaty.memorycard.StorageBackend
+import com.fzu.wechaty.memorycard.StorageBackendOptions
+import com.fzu.wechaty.memorycard.StorageS3Options
+import com.fzu.wechaty.utils.JsonUtils
 import org.slf4j.LoggerFactory
 
-class StorageS3(val name: String, var options: StorageBackendOptions) : StorageBackend(name,options) {
+class StorageS3(val name: String, var options: StorageBackendOptions) : StorageBackend(name, options) {
 
     private lateinit var s3: AmazonS3
 
@@ -82,6 +85,4 @@ fun main(){
 
 //    val storageS3 = StorageS3("test", StorageS3Options("1", "1", "2", "3"))
 //    val load = storageS3.load()
-    var function: () -> Unit = {}
-
 }

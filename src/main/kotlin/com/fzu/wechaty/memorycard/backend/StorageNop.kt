@@ -1,7 +1,9 @@
-package io.github.wechaty.io.github.wechaty.memorycard.backend
+package com.fzu.wechaty.memorycard.backend
 
-import io.github.wechaty.memorycard.*
-import io.github.wechaty.utils.JsonUtils
+import com.fzu.wechaty.memorycard.MemoryCardPayload
+import com.fzu.wechaty.memorycard.StorageBackend
+import com.fzu.wechaty.memorycard.StorageBackendOptions
+import com.fzu.wechaty.memorycard.StorageNopOptions
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils

@@ -1,6 +1,6 @@
-package io.github.wechaty.memorycard
+package com.fzu.wechaty.memorycard
 
-import io.github.wechaty.io.github.wechaty.memorycard.backend.StorageFile
+import com.fzu.wechaty.memorycard.backend.StorageFile
 import io.github.wechaty.utils.JsonUtils
 import org.slf4j.LoggerFactory
 
@@ -17,7 +17,7 @@ abstract class StorageBackend(name: String, option: StorageBackendOptions) {
     companion object{
         private val log = LoggerFactory.getLogger(StorageBackend::class.java)
 
-        fun getStorage(name: String,options: StorageBackendOptions?): StorageBackend {
+        fun getStorage(name: String,options: StorageBackendOptions?): StorageFile {
             log.info("getStorage', name: %s, options: %s", name, options?.let { JsonUtils.write(it) })
 
             var _options = options

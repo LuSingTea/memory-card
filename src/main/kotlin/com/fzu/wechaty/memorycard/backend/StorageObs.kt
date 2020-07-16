@@ -1,20 +1,14 @@
-package io.github.wechaty.io.github.wechaty.memorycard.backend
+package com.fzu.wechaty.memorycard.backend
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider
-import com.amazonaws.auth.BasicAWSCredentials
-import com.amazonaws.regions.Regions
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.AmazonS3ClientBuilder
+import com.fzu.wechaty.memorycard.MemoryCardPayload
+import com.fzu.wechaty.memorycard.StorageBackend
+import com.fzu.wechaty.memorycard.StorageBackendOptions
+import com.fzu.wechaty.memorycard.StorageObsOptions
 import com.obs.services.ObsClient
-import io.github.wechaty.memorycard.*
 import io.github.wechaty.utils.JsonUtils
-import org.apache.commons.io.FileUtils
-import org.apache.commons.io.FilenameUtils
-import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.File
 
 // 使用华为的云存储服务
 class StorageObs(val name: String, var options: StorageBackendOptions) : StorageBackend(name,options) {
@@ -107,10 +101,10 @@ fun main(){
 
     val storageObs = StorageObs("objectname", storageObsOptions)
     var memory = MemoryCardPayload()
-    var address = Address("福州", "付件")
-    var person = Person("sda", 13, address)
-    memory.map.put("person", person)
-    storageObs.save(memory)
+//    var address = Address("福州", "付件")
+//    var person = Person("sda", 13, address)
+//    memory.map.put("person", person)
+//    storageObs.save(memory)
 
 //    val load = storageObs.load()
 //    println(load.map)
