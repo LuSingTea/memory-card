@@ -39,7 +39,7 @@ class StateSwitch: EventEmitter(){
 
         onQueue = ArrayBlockingQueue(1)
         offQueue = ArrayBlockingQueue(1)
-
+        this.offQueue.put(resolver)
     }
 
     // 传入on的状态只能是on或者说pending
@@ -172,13 +172,14 @@ fun main() {
     println(stateSwitch.on())
     stateSwitch.on(StateEnum.ON)
     println(stateSwitch.on())
-//    stateSwitch.on(StateEnum.PENDING)
-//    println(stateSwitch.on())
-//
-//    stateSwitch.on(StateEnum.ON)
-//    println(stateSwitch.on())
-//
-//    stateSwitch.on(StateEnum.OFF)
-//    println(stateSwitch.on())
+    // ======================================
+    stateSwitch.off(StateEnum.PENDING)
+    println(stateSwitch.off())
+
+    stateSwitch.ready(StateEnum.OFF)
+    println(stateSwitch.on())
+
+    stateSwitch.off(StateEnum.OFF)
+    println(stateSwitch.on())
 
 }

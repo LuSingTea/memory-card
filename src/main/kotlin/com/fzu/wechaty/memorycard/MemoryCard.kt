@@ -330,6 +330,7 @@ class MemoryCard {
 
         return "MemoryCard<${name}>${mpString}"
     }
+
     companion object{
         private val log = LoggerFactory.getLogger(MemoryCard::class.java)
         val VERSION = "0.0.0"

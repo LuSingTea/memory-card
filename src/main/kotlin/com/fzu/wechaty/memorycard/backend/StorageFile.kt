@@ -103,8 +103,6 @@ class StorageFile(val name: String, var options: StorageBackendOptions) : Storag
     }
 }
 
-
-
 fun main() {
     val storageFile = StorageFile("test", StorageFileOptions())
 }

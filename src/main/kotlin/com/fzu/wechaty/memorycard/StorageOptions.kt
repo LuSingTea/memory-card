@@ -30,6 +30,13 @@ data class StorageObsOptions(
     val bucket:String
 ): StorageBackendOptions()
 
+data class StorageOSSOptions(
+    val accessKeyId: String,
+    val secretAccessKey: String,
+    val endPoint: String,
+    val bucket: String
+): StorageBackendOptions()
+
 val BACKEND_DICT = mapOf(
     "file" to StorageFile::class,
     "s3" to StorageS3::class,

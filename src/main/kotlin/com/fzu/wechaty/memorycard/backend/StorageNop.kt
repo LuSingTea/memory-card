@@ -4,11 +4,7 @@ import com.fzu.wechaty.memorycard.MemoryCardPayload
 import com.fzu.wechaty.memorycard.StorageBackend
 import com.fzu.wechaty.memorycard.StorageBackendOptions
 import com.fzu.wechaty.memorycard.StorageNopOptions
-import org.apache.commons.io.FileUtils
-import org.apache.commons.io.FilenameUtils
-import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
-import java.io.File
 
 class StorageNop(val name: String, var options: StorageBackendOptions) : StorageBackend(name,options) {
 
@@ -39,8 +35,6 @@ class StorageNop(val name: String, var options: StorageBackendOptions) : Storage
         private val log = LoggerFactory.getLogger(StorageNop::class.java)
     }
 }
-
-
 
 fun main() {
     var storageNop = StorageNop("test", StorageNopOptions())
