@@ -1,4 +1,4 @@
-package com.fzu.wechaty.utils
+package io.github.wechaty.utils
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper

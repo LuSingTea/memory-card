@@ -28,7 +28,11 @@
             <artifactId>wechaty-puppet</artifactId>
             <version>0.1.4-SNAPSHOT</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.10.0</version>
+        </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
@@ -55,7 +59,7 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.10</version>
         </dependency>
-
+        <!-- 对象存储服务的sdk -->
         <dependency>
             <groupId>com.huaweicloud</groupId>
             <artifactId>esdk-obs-java</artifactId>
@@ -66,7 +70,13 @@
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>1.11.636</version>
         </dependency>
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>3.10.2</version>
+        </dependency>
 
+        <!-- 日志依赖 -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -88,6 +98,7 @@
             <version>2.13.1</version>
         </dependency>
 
+        <!-- 谷歌工具类 -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -103,6 +114,8 @@
             <artifactId>disruptor</artifactId>
             <version>3.4.2</version>
         </dependency>
+
+        <!-- json工具类 -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
@@ -118,11 +131,7 @@
             <artifactId>jackson-module-kotlin</artifactId>
             <version>2.11.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.aliyun.oss</groupId>
-            <artifactId>aliyun-sdk-oss</artifactId>
-            <version>3.10.2</version>
-        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
