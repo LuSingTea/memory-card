@@ -1,11 +1,13 @@
-package com.fzu.wechaty.memorycard
+package io.github.wechaty.memorycard
 
-import com.fzu.wechaty.utils.JsonUtils
+import io.github.wechaty.utils.JsonUtils
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.lang.Exception
+import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Future
+import javax.xml.bind.JAXBElement
 import kotlin.math.abs
 
 const val NAMESPACE_MULTIPLEX_SEPRATOR = "\r"
@@ -81,11 +83,11 @@ class MemoryCard {
         )
     }
 
-    fun load(): Future<Void> {
+    suspend fun loadAsync() {
         log.info("MemoryCard, load() from storage: {}", this.storage ?: "N/A")
         if (this.isMultiplex()) {
             log.info("MemoryCard, load() should not be called on a multiplex MemoryCard. NOOP")
-            return CompletableFuture.completedFuture(null)
+            return
         }
         if (this.payload != null) {
             throw Exception("memory had already loaded before.")
@@ -98,10 +100,28 @@ class MemoryCard {
             log.info("MemoryCard, load() no storagebackend")
             this.payload = MemoryCardPayload()
         }
-        return CompletableFuture.completedFuture(null)
     }
 
-    fun save(): Future<Void> {
+    fun load() {
+        log.info("MemoryCard, load() from storage: {}", this.storage ?: "N/A")
+        if (this.isMultiplex()) {
+            log.info("MemoryCard, load() should not be called on a multiplex MemoryCard. NOOP")
+            return
+        }
+        if (this.payload != null) {
+            throw Exception("memory had already loaded before.")
+        }
+
+        if (this.storage != null) {
+            this.payload = this.storage!!.load()
+        }
+        else {
+            log.info("MemoryCard, load() no storagebackend")
+            this.payload = MemoryCardPayload()
+        }
+    }
+
+    fun save() {
         if (this.isMultiplex()) {
             if (this.parent == null) {
                 throw Exception("multiplex memory no parent")
@@ -116,14 +136,13 @@ class MemoryCard {
 
         if (this.storage == null) {
             log.info("MemoryCard, save() no storage, NOOP")
-            return CompletableFuture.completedFuture(null)
+            return
         }
 
         this.storage!!.save(this.payload!!)
-        return CompletableFuture.completedFuture(null)
     }
 
-    fun destory(): Future<Void> {
+    fun destory() {
         log.info("MemoryCard, destroy() storage: {}", this.storage ?: "N/A")
         if (this.isMultiplex()) {
             throw Exception("can not destroy on a multiplexed memory")
@@ -136,18 +155,17 @@ class MemoryCard {
             this.storage = null
         }
         this.payload = null
-        return CompletableFuture.completedFuture(null)
     }
 
 
-    fun size(): Future<Int> {
+    fun size(): Int {
         log.info("MemoryCard, <{}> size", this.multiplexPath())
 
         if (this.payload == null) {
             throw Exception("no payload, please call load() first.")
         }
 
-        var count: Int
+        val count: Int
         if (this.isMultiplex()) {
             count = this.payload!!.map.keys
                 .filter { key -> this.isMultiplexKey(key) }
@@ -157,7 +175,7 @@ class MemoryCard {
             count = this.payload!!.map.size
         }
 
-        return CompletableFuture.completedFuture(count)
+        return count
     }
 
 
@@ -174,15 +192,15 @@ class MemoryCard {
             throw Exception("not a multiplex memory")
         }
 
-        // \r + \n
         val namespace = NAMESPACE_MULTIPLEX_SEPRATOR +
                         this.multiplexNameList.joinToString(NAMESPACE_MULTIPLEX_SEPRATOR)
         return namespace
     }
+
     protected fun isMultiplexKey(key: String): Boolean {
 
-        if (NAMESPACE_MULTIPLEX_SEPRATOR_REGEX.matches(key)
-            && NAMESPACE_KEY_SEPRATOR_REGEX.matches(key)) {
+        if (NAMESPACE_MULTIPLEX_SEPRATOR_REGEX.containsMatchIn(key)
+            && NAMESPACE_KEY_SEPRATOR_REGEX.containsMatchIn(key)) {
 
             val namespace = this.multiplexNamespace()
             return key.startsWith(namespace)
@@ -201,19 +219,24 @@ class MemoryCard {
         }
     }
 
-    fun  get(name: String): CompletableFuture<Any?>? {
+    fun get(name: String): Any? {
         log.info("MemoryCard, <{}> get({})", this.multiplexPath(), name)
         if (this.payload == null) {
             throw Exception("no payload, please call load() first.")
         }
 
         val key = this.resolveKey(name)
-        return CompletableFuture.supplyAsync {
-            this.payload!!.map.get(key)
-        }
+        return this.payload!!.map.get(key)
     }
-
-    fun <T : Any> set(name: String, data: T): Future<Void> {
+    /**
+     * 功能描述:
+     *
+     * @Param:
+     * @Return:
+     * @Author: a1725
+     * @Date: 2020/7/18 23:54
+     */
+    fun <T : Any> set(name: String, data: T) {
         log.info("MemoryCard, <{}> set({}, {})", this.multiplexPath(), name, data)
 
         if (this.payload == null) {
@@ -222,10 +245,9 @@ class MemoryCard {
 
         val key = this.resolveKey(name)
         this.payload!!.map[key] = data as Any
-        return CompletableFuture.completedFuture(null)
     }
 
-    fun clear(): Future<Void> {
+    fun clear() {
         log.info("MemoryCard, <{}> clear()", this.multiplexPath())
 
         if (this.payload == null) {
@@ -240,10 +262,9 @@ class MemoryCard {
         else {
             this.payload = MemoryCardPayload()
         }
-        return CompletableFuture.completedFuture(null)
     }
 
-    fun delete(name: String): Future<Void> {
+    fun delete(name: String) {
         log.info("MemoryCard, <{}> delete({})", this.multiplexPath(), name)
         if (this.payload == null) {
             throw Exception("no payload, please call load() first.")
@@ -251,7 +272,6 @@ class MemoryCard {
 
         val key = this.resolveKey(name)
         this.payload!!.map.remove(key)
-        return CompletableFuture.completedFuture(null)
     }
 
     fun entries(): MutableSet<MutableMap.MutableEntry<String, Any>> {
@@ -264,7 +284,7 @@ class MemoryCard {
         return this.payload!!.map.entries
     }
 
-    fun has(key: String): Future<Boolean> {
+    fun has(key: String): Boolean {
         log.info("MemoryCard, <{}> has ({})", this.multiplexPath(), key)
 
         if (this.payload == null) {
@@ -272,9 +292,7 @@ class MemoryCard {
         }
 
         val absoluteKey = this.resolveKey(key)
-        return CompletableFuture.supplyAsync {
-            this.payload!!.map.containsKey(absoluteKey)
-        }
+        return this.payload!!.map.containsKey(absoluteKey)
     }
 
     fun keys(): MutableSet<String> {
@@ -309,12 +327,7 @@ class MemoryCard {
         return this.payload!!.map.values
     }
 
-    fun multiplex (name: String): MemoryCard {
-        log.info("MemoryCard, multiplex({})", name)
 
-        // FIXME: as any ?
-        return multiplex(this, name)
-    }
 
     override fun toString(): String {
         var mpString = ""
@@ -331,16 +344,30 @@ class MemoryCard {
         return "MemoryCard<${name}>${mpString}"
     }
 
-    companion object{
+    fun getVersion(): String {
+        return VERSION
+    }
+
+    fun getName(): String? {
+        return this.name
+    }
+    // 会将当前的类作为parent, 后面那个为namespace
+    fun multiplex(nameSpace: String): MemoryCard {
+        log.info("MemoryCard, multiplex({})", nameSpace)
+        return multiplex(this, nameSpace)
+    }
+
+    protected fun multiplex(parent: MemoryCard, nameSpace: String): MemoryCard {
+        log.info("MemoryCard, multiplex({}, {})", parent, nameSpace)
+        parent.options.name = parent.name
+        parent.options.multiplex = Multiplex(name = nameSpace, parent = parent)
+        val mpMemory = MemoryCard(options = parent.options)
+        return mpMemory
+    }
+
+    companion object {
         private val log = LoggerFactory.getLogger(MemoryCard::class.java)
         val VERSION = "0.0.0"
-
-        fun multiplex(memory: MemoryCard, name: String): MemoryCard{
-            log.info("MemoryCard, static multiplex({}, {})", memory, name)
-            memory.options.multiplex = Multiplex(name = name, parent = memory)
-            val mpMemory = MemoryCard(options = memory.options)
-            return mpMemory
-        }
 
         fun fromJSON(text: String): MemoryCard {
             log.info("MemoryCard, fromJSON(...)")

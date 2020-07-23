@@ -1,10 +1,10 @@
-package com.fzu.wechaty.memorycard.backend
+package io.github.wechaty.memorycard.backend
 
-import com.fzu.wechaty.memorycard.MemoryCardPayload
-import com.fzu.wechaty.memorycard.StorageBackend
-import com.fzu.wechaty.memorycard.StorageBackendOptions
-import com.fzu.wechaty.memorycard.StorageFileOptions
-import com.fzu.wechaty.utils.JsonUtils
+import io.github.wechaty.memorycard.MemoryCardPayload
+import io.github.wechaty.memorycard.StorageBackend
+import io.github.wechaty.memorycard.StorageBackendOptions
+import io.github.wechaty.memorycard.StorageFileOptions
+import io.github.wechaty.utils.JsonUtils
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
@@ -12,10 +12,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
 import java.lang.Exception
-import kotlin.math.abs
 
-// 本身是不存储数据的
-// 存储了持久化的文件名和以及用什么方式存储
 class StorageFile(val name: String, var options: StorageBackendOptions) : StorageBackend(name, options) {
 
     private var absFileName: String
@@ -49,6 +46,7 @@ class StorageFile(val name: String, var options: StorageBackendOptions) : Storag
         if(!file.exists()){
             return MemoryCardPayload()
         }
+
         var text = ""
         try {
             text = FileUtils.readFileToString(file, "UTF-8")
@@ -57,9 +55,9 @@ class StorageFile(val name: String, var options: StorageBackendOptions) : Storag
             log.error("load() from file %s error %s", this.absFileName, e.toString())
         }
 
-        var payload = MemoryCardPayload()
+        val payload = MemoryCardPayload()
         try {
-            payload.map = JsonUtils.readValue(text);
+            payload.map = JsonUtils.readValue(text)
         }
         catch (e: Exception) {
             log.error("MemoryCard, load() exception: %s", e)
@@ -103,6 +101,11 @@ class StorageFile(val name: String, var options: StorageBackendOptions) : Storag
     }
 }
 
+
+
 fun main() {
     val storageFile = StorageFile("test", StorageFileOptions())
+    val load = storageFile.load()
+    load.map.put("a", "b")
+    storageFile.save(load)
 }

@@ -1,9 +1,6 @@
-package com.fzu.wechaty.memorycard.backend
+package io.github.wechaty.memorycard.backend
 
-import com.fzu.wechaty.memorycard.MemoryCardPayload
-import com.fzu.wechaty.memorycard.StorageBackend
-import com.fzu.wechaty.memorycard.StorageBackendOptions
-import com.fzu.wechaty.memorycard.StorageNopOptions
+import io.github.wechaty.memorycard.*
 import org.slf4j.LoggerFactory
 
 class StorageNop(val name: String, var options: StorageBackendOptions) : StorageBackend(name,options) {
@@ -36,7 +33,9 @@ class StorageNop(val name: String, var options: StorageBackendOptions) : Storage
     }
 }
 
+
+
 fun main() {
-    var storageNop = StorageNop("test", StorageNopOptions())
+    val storageNop = StorageNop("test", StorageNopOptions())
     println(storageNop)
 }

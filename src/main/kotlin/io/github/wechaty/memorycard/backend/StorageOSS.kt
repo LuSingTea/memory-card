@@ -1,24 +1,24 @@
-package com.fzu.wechaty.memorycard.backend
+package io.github.wechaty.memorycard.backend
 
 import com.aliyun.oss.OSSClient
 import com.aliyun.oss.OSSClientBuilder
-import com.fzu.wechaty.memorycard.*
-import com.obs.services.ObsClient
+import com.aliyun.oss.model.PutObjectRequest
+import io.github.wechaty.memorycard.*
 import io.github.wechaty.utils.JsonUtils
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
-// 使用华为的云存储服务
+// 使用阿里的云存储服务
 class StorageOSS(val name: String, var options: StorageBackendOptions) : StorageBackend(name,options) {
 
-    private lateinit var oss: OSSClient
+    private var oss: OSSClient
 
     init {
         log.info("StorageOSS, constructor()")
         options.type = "oss"
         options = options as StorageOSSOptions
-        var _options = options as StorageOSSOptions
+        val _options = options as StorageOSSOptions
         this.oss = OSSClientBuilder().build(_options.endPoint,_options.accessKeyId, _options.secretAccessKey) as OSSClient
     }
 
@@ -30,10 +30,6 @@ class StorageOSS(val name: String, var options: StorageBackendOptions) : Storage
     override fun load(): MemoryCardPayload {
         log.info("StorageOSS, load()")
         val card = this.getObject()
-        if (card == null) {
-            return MemoryCardPayload()
-        }
-
         log.info("press", card)
         return card
     }
@@ -43,22 +39,32 @@ class StorageOSS(val name: String, var options: StorageBackendOptions) : Storage
         this.deleteObject()
     }
 
-    override fun toString(): String {
-        return "${this.name}<${this.name}>"
-    }
-
     private fun putObject(payload: MemoryCardPayload) {
-        val options = this.options as StorageObsOptions
-        val putObject = this.oss.putObject(options.bucket, this.name, ByteArrayInputStream(JsonUtils.write(payload.map).toByteArray()))
-        // 还需要处理异常
+        val options = this.options as StorageOSSOptions
+
+        val putObjectRequest = PutObjectRequest(options.bucket, this.name, ByteArrayInputStream(JsonUtils.write(payload.map).toByteArray()))
+        try {
+            this.oss.putObject(putObjectRequest)
+        }
+        catch (e: Exception) {
+            log.error("上传${this.name}错误")
+        }
     }
 
     private fun getObject(): MemoryCardPayload {
-        val options = this.options as StorageObsOptions
-        val obsObject = this.oss.getObject(options.bucket, this.name)
-        println(obsObject)
-        val input = obsObject.objectContent
-        var byte = ByteArray(1024)
+        val options = this.options as StorageOSSOptions
+        val ossObject = try {
+            this.oss.getObject(options.bucket, this.name)
+        }
+        catch (e: Exception) {
+            log.error("获取文件${this.name}失败")
+            null
+        }
+        if (ossObject == null) {
+            return MemoryCardPayload()
+        }
+        val input = ossObject.objectContent
+        val byte = ByteArray(1024)
         val bos = ByteArrayOutputStream()
         var len = 0;
         while (true) {
@@ -71,14 +77,29 @@ class StorageOSS(val name: String, var options: StorageBackendOptions) : Storage
             }
         }
         input.close()
-        var card = MemoryCardPayload()
+        ossObject.close()
+        val card = MemoryCardPayload()
         card.map = JsonUtils.readValue(String(bos.toByteArray()))
         return card
     }
 
     private fun deleteObject() {
-        val options = this.options as StorageObsOptions
-        val deleteObject = this.oss.deleteObject(options.bucket, this.name)
+        val options = this.options as StorageOSSOptions
+        try {
+            this.oss.deleteObject(options.bucket, this.name)
+        }
+        catch (e: Exception) {
+            log.error("删除${this.name}错误")
+        }
+    }
+
+    fun shutdown() {
+        log.info("StorageOSS, shutdown()")
+        this.oss.shutdown()
+    }
+
+    override fun toString(): String {
+        return "${this.name}<${this.name}>"
     }
 
     companion object {
